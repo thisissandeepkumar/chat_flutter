@@ -1,7 +1,9 @@
 const String domainName = '192.168.29.174';
 const String post = '4545';
+const String websocketPort = '4546';
 
 const String domainURL = 'http://' + domainName + ':' + post + '/';
+const String websocketURL = 'ws://' + domainName + ':' + websocketPort + '/';
 
 const String chatroomURL = domainURL + 'chatroom/';
 const String messageURL = domainURL + 'message/';
