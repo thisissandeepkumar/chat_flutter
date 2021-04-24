@@ -1,6 +1,11 @@
+import 'dart:convert';
+
+import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/models/appstate.dart';
+import 'package:chat_flutter/models/user.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class SplashScreen extends StatefulWidget {
   SplashScreen({Key? key}) : super(key: key);
@@ -14,12 +19,20 @@ class _SplashScreenState extends State<SplashScreen> {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     String? token = preferences.getString('token');
     if (token != null) {
-      setState(() {
-        Appstate.authorizationHeaders = {'Authorization': token};
-      });
-      Navigator.pushNamed(context, 'dashboard');
+      http.Response response = await http
+          .get(Uri.parse(verifyURL), headers: {'Authorization': token});
+      if (response.statusCode == 200) {
+        User user = User.fromJSON(jsonDecode(response.body));
+        setState(() {
+          Appstate.authorizationHeaders = {'Authorization': token};
+          Appstate.currentUser = user;
+        });
+        Navigator.pushReplacementNamed(context, 'dashboard');
+      } else {
+        Navigator.pushReplacementNamed(context, 'login');
+      }
     } else {
-      Navigator.pushNamed(context, 'login');
+      Navigator.pushReplacementNamed(context, 'login');
     }
   }
 

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/models/appstate.dart';
-import 'package:chat_flutter/widgets/button.dart';
+import 'package:chat_flutter/models/user.dart';
 import 'package:chat_flutter/widgets/textInput.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,8 +34,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
+    return CupertinoPageScaffold(
+      child: Container(
         decoration: BoxDecoration(
             border: Border.all(
           color: Colors.black,
@@ -90,9 +90,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         Appstate.authorizationHeaders = {
                           'Authorization': dataMap['token']
                         };
+                        Appstate.currentUser = User.fromJSON(dataMap['user']);
                       });
                       preferences.setString('token', dataMap['token']);
-                      Navigator.pushNamed(context, 'dashboard');
+                      Navigator.pushReplacementNamed(context, 'dashboard');
                     }
                   }
                 },
