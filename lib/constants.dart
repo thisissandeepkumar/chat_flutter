@@ -10,6 +10,8 @@ const String messageURL = domainURL + 'message/';
 
 const String loginURL = domainURL + 'auth/login/';
 const String verifyURL = domainURL + 'auth/verify/';
+const String uniqueCheckURL = domainURL + 'auth/unique/';
+const String registerURL = domainURL + 'auth/register/';
 const String getMyChatroomsURL = chatroomURL + 'room/';
 const String startChatroomURL = chatroomURL + 'room/';
 const String getChatroomMessagesURL = messageURL + 'get/';

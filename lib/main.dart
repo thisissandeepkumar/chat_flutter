@@ -1,6 +1,7 @@
 import 'package:chat_flutter/pages/chatpage/index.dart';
 import 'package:chat_flutter/pages/dashboard/index.dart';
 import 'package:chat_flutter/pages/login/index.dart';
+import 'package:chat_flutter/pages/register/index.dart';
 import 'package:chat_flutter/pages/splash/index.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,6 +37,7 @@ class MyApp extends StatelessWidget {
         'login': (context) => LoginScreen(),
         'dashboard': (context) => DashBoard(),
         'chatroom': (context) => ChatPage(),
+        'register': (context) => Registration(),
       },
       theme: CupertinoThemeData(),
     );

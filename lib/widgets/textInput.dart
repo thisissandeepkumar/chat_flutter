@@ -6,8 +6,10 @@ class CustomInputField extends StatefulWidget {
   TextEditingController? controller;
   bool? obscureText;
   TextInputType? textInputType;
+  String? placeHolderText;
   CustomInputField(
       {Key? key,
+      this.placeHolderText,
       required this.context,
       @required this.controller,
       this.obscureText,
@@ -17,6 +19,7 @@ class CustomInputField extends StatefulWidget {
   @override
   _CustomInputFieldState createState() => _CustomInputFieldState(
       mainScreenContext: context,
+      placeHolderText: placeHolderText,
       controller: controller,
       textInputType: textInputType,
       obscureText: obscureText);
@@ -27,10 +30,12 @@ class _CustomInputFieldState extends State<CustomInputField> {
   TextInputType? textInputType;
   bool? obscureText;
   BuildContext mainScreenContext;
+  String? placeHolderText;
   _CustomInputFieldState(
       {required this.mainScreenContext,
       @required this.controller,
       this.textInputType,
+      this.placeHolderText,
       this.obscureText});
   @override
   Widget build(BuildContext context) {
@@ -45,6 +50,7 @@ class _CustomInputFieldState extends State<CustomInputField> {
         right: 15.0,
       ),
       child: CupertinoTextField(
+        placeholder: placeHolderText == null ? '' : placeHolderText,
         controller: controller,
         keyboardType: textInputType,
         obscureText: obscureText == null ? false : true,

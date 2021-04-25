@@ -7,7 +7,6 @@ import 'package:chat_flutter/pages/chatpage/tiles.dart';
 import 'package:chat_flutter/services/message_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatPage extends StatefulWidget {
   ChatPage({Key? key}) : super(key: key);
