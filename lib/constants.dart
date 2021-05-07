@@ -1,4 +1,4 @@
-const String domainName = '192.168.29.48';
+const String domainName = '35.154.254.131';
 const String post = '8000';
 const String websocketPort = '4545';
 
