@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/models/appstate.dart';
 import 'package:chat_flutter/models/message.dart';
@@ -7,6 +5,14 @@ import 'package:chat_flutter/pages/chatpage/tiles.dart';
 import 'package:chat_flutter/services/message_service.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:web_socket_channel/io.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
+
+import '../../constants.dart';
+import '../../models/appstate.dart';
+import '../../models/appstate.dart';
+import '../../models/appstate.dart';
+import '../../models/message.dart';
+import '../../services/message_service.dart';
 
 class ChatPage extends StatefulWidget {
   ChatPage({Key? key}) : super(key: key);
@@ -18,8 +24,40 @@ class ChatPage extends StatefulWidget {
 class _ChatPageState extends State<ChatPage> {
   late ScrollController scrollController;
   late TextEditingController messageController;
-  late var channel;
   late List<Message> messagesList;
+  late IO.Socket socket;
+
+  void connectToServer() {
+    try {
+      print('Trying to connect!');
+      socket = IO.io(websocketURL, <String, dynamic>{
+        'transports': ['websocket'],
+        'auth': {
+          'token': Appstate.authorizationHeaders['Authorization'],
+          'room': Appstate.currentChatroom.id.toString(),
+        },
+        'autoConnect': false,
+      });
+      socket.connect();
+      socket.on('connection', (_) {
+        print('Connected!');
+      });
+      socket.on('new', (data) {
+        print(data);
+        messagesList.add(Message(
+            id: data['id'],
+            chatroom_id: Appstate.currentChatroom.id,
+            sender_id: data['sender_id'],
+            content: data['content'],
+            delivered: false,
+            isread: false,
+            sent: DateTime.now()));
+        setState(() {});
+      });
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 
   @override
   void initState() {
@@ -27,31 +65,32 @@ class _ChatPageState extends State<ChatPage> {
     scrollController = new ScrollController();
     messageController = new TextEditingController();
     messagesList = [];
-    channel = IOWebSocketChannel.connect(Uri.parse(websocketURL));
-    channel.stream.listen((message) {
-      if (message != 'connected') {
-        Map tempMap = jsonDecode(message);
-        if (tempMap['chatroom'] == Appstate.currentChatroom.id &&
-            tempMap['sender'] != Appstate.currentUser.id) {
-          Message newMessage = Message(
-              chatroom_id: Appstate.currentChatroom.id,
-              id: tempMap['id'],
-              sender_id: tempMap['sender'],
-              delivered: false,
-              isread: false,
-              content: tempMap['content'],
-              sent: DateTime.now());
-          messagesList.add(newMessage);
-          setState(() {});
-        }
-      }
-    });
+    connectToServer();
+    // channel = IOWebSocketChannel.connect(Uri.parse(websocketURL));
+    // channel.stream.listen((message) {
+    //   if (message != 'connected') {
+    //     Map tempMap = jsonDecode(message);
+    //     if (tempMap['chatroom'] == Appstate.currentChatroom.id &&
+    //         tempMap['sender'] != Appstate.currentUser.id) {
+    //       Message newMessage = Message(
+    //           chatroom_id: Appstate.currentChatroom.id,
+    //           id: tempMap['id'],
+    //           sender_id: tempMap['sender'],
+    //           delivered: false,
+    //           isread: false,
+    //           content: tempMap['content'],
+    //           sent: DateTime.now());
+    //       messagesList.add(newMessage);
+    //       setState(() {});
+    //     }
+    //   }
+    // });
   }
 
   @override
   void dispose() {
     super.dispose();
-    channel.sink.close();
+    socket.destroy();
   }
 
   @override
@@ -86,6 +125,7 @@ class _ChatPageState extends State<ChatPage> {
                         } else {
                           messagesList = snapshot.data;
                           return ListView.builder(
+                              controller: scrollController,
                               itemCount: messagesList.length,
                               itemBuilder: (BuildContext context, index) {
                                 return Container(
@@ -134,16 +174,10 @@ class _ChatPageState extends State<ChatPage> {
                         child: GestureDetector(
                           onTap: () async {
                             if (messageController.text.isNotEmpty) {
-                              // await sendMessage(
-                              //     context, messageController.text);
-                              channel.sink.add(jsonEncode({
-                                "content": messageController.text,
-                                "token": Appstate
-                                    .authorizationHeaders['Authorization'],
-                                "chatroom": Appstate.currentChatroom.id
-                              }));
+                              await sendMessage(
+                                  context, messageController.text);
                               messageController.clear();
-                              setState(() {});
+                              scrollController.position.minScrollExtent;
                             }
                           },
                           child: Icon(
