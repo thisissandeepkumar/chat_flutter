@@ -24,7 +24,7 @@ class Message {
         sender_id: json['sender_id'],
         content: json['content'],
         delivered: json['delivered'] == 0 ? false : true,
-        isread: json['read'] == 0 ? false : true,
+        isread: json['isread'] == 0 ? false : true,
         sent: DateTime.parse(json['sent']));
   }
 

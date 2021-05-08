@@ -3,6 +3,7 @@ import 'package:chat_flutter/constants.dart';
 import 'package:chat_flutter/models/appstate.dart';
 import 'package:chat_flutter/models/user.dart';
 import 'package:chat_flutter/widgets/textInput.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -19,9 +20,11 @@ class _LoginScreenState extends State<LoginScreen> {
   TextEditingController loginController = new TextEditingController();
   TextEditingController passwordController = new TextEditingController();
   late SharedPreferences preferences;
+  late String? fcmString;
 
   void initializeSharedPreferences() async {
     preferences = await SharedPreferences.getInstance();
+    fcmString = await FirebaseMessaging.instance.getToken();
   }
 
   @override
@@ -89,24 +92,28 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () async {
                       if (loginController.text.isNotEmpty &&
                           passwordController.text.isNotEmpty) {
-                        http.Response response = await http.post(
-                            Uri.parse(loginURL),
-                            headers: {"content-type": "application/json"},
-                            body: jsonEncode({
-                              'login': loginController.text,
-                              'password': passwordController.text
-                            }));
-                        if (response.statusCode == 200) {
-                          Map dataMap = jsonDecode(response.body);
-                          setState(() {
-                            Appstate.authorizationHeaders = {
-                              'Authorization': dataMap['token']
-                            };
-                            Appstate.currentUser =
-                                User.fromJSON(dataMap['user']);
-                          });
-                          preferences.setString('token', dataMap['token']);
-                          Navigator.pushReplacementNamed(context, 'dashboard');
+                        if (fcmString != null) {
+                          http.Response response =
+                              await http.post(Uri.parse(loginURL),
+                                  headers: {"content-type": "application/json"},
+                                  body: jsonEncode({
+                                    'login': loginController.text,
+                                    'password': passwordController.text,
+                                    'token': fcmString
+                                  }));
+                          if (response.statusCode == 200) {
+                            Map dataMap = jsonDecode(response.body);
+                            setState(() {
+                              Appstate.authorizationHeaders = {
+                                'Authorization': dataMap['token']
+                              };
+                              Appstate.currentUser =
+                                  User.fromJSON(dataMap['user']);
+                            });
+                            preferences.setString('token', dataMap['token']);
+                            Navigator.pushReplacementNamed(
+                                context, 'dashboard');
+                          }
                         }
                       }
                     },

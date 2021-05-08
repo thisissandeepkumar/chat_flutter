@@ -26,7 +26,6 @@ Future<List<Chatroom>> getAllChatrooms(BuildContext context) async {
     }
     return [];
   } else {
-    print(response.statusCode);
     return [];
   }
 }
@@ -54,4 +53,10 @@ Future<int> startChatroom(BuildContext context, String query) async {
   } else {
     return 3;
   }
+}
+
+Future<void> deleteChatroom(BuildContext context, String id) async {
+  Uri finalURL = Uri.parse(startChatroomURL + id);
+  http.Response response =
+      await http.delete(finalURL, headers: getAuthorizationHeaders());
 }
