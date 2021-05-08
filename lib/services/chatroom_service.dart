@@ -26,7 +26,6 @@ Future<List<Chatroom>> getAllChatrooms(BuildContext context) async {
     }
     return [];
   } else {
-    print(response.statusCode);
     return [];
   }
 }

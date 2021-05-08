@@ -92,7 +92,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     onPressed: () async {
                       if (loginController.text.isNotEmpty &&
                           passwordController.text.isNotEmpty) {
-                        print(fcmString);
                         if (fcmString != null) {
                           http.Response response =
                               await http.post(Uri.parse(loginURL),

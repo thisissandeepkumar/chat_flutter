@@ -34,11 +34,8 @@ class _ChatPageState extends State<ChatPage> {
         'autoConnect': false,
       });
       socket.connect();
-      socket.on('connection', (_) {
-        print('Connected!');
-      });
+      socket.on('connection', (_) {});
       socket.on('all', (data) {
-        print('In');
         if (data['user'] != Appstate.currentUser.id) {
           messagesList.forEach((element) {
             element.isread = true;
@@ -63,9 +60,7 @@ class _ChatPageState extends State<ChatPage> {
               duration: Duration(milliseconds: 300), curve: Curves.easeOut);
         });
       });
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 
   @override

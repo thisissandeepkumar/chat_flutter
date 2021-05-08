@@ -129,6 +129,9 @@ class _MyAppState extends State<MyApp> {
       );
     }
     return CupertinoApp(
+      theme: CupertinoThemeData(
+        brightness: Brightness.light,
+      ),
       home: SplashScreen(),
       routes: {
         'splash': (context) => SplashScreen(),

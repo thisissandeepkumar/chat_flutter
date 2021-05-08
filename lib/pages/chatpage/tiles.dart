@@ -23,7 +23,6 @@ class MessageTileState extends State<MessageTile> {
 
   @override
   Widget build(BuildContext context) {
-    print(message.isread);
     isSender = message.sender_id == Appstate.currentUser.id;
     return Align(
       alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
