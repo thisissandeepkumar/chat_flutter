@@ -55,3 +55,9 @@ Future<int> startChatroom(BuildContext context, String query) async {
     return 3;
   }
 }
+
+Future<void> deleteChatroom(BuildContext context, String id) async {
+  Uri finalURL = Uri.parse(startChatroomURL + id);
+  http.Response response =
+      await http.delete(finalURL, headers: getAuthorizationHeaders());
+}

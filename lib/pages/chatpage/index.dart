@@ -37,7 +37,19 @@ class _ChatPageState extends State<ChatPage> {
       socket.on('connection', (_) {
         print('Connected!');
       });
+      socket.on('all', (data) {
+        print('In');
+        if (data['user'] != Appstate.currentUser.id) {
+          messagesList.forEach((element) {
+            element.isread = true;
+          });
+          setState(() {});
+        }
+      });
       socket.on('new', (data) {
+        if (data['sender_id'] != Appstate.currentUser.id) {
+          socket.emit('read', {'id': data['id']});
+        }
         setState(() {
           messagesList.add(Message(
               id: data['id'],
@@ -63,6 +75,8 @@ class _ChatPageState extends State<ChatPage> {
     messageController = new TextEditingController();
     messagesList = [];
     connectToServer();
+    socket.emit("all",
+        {'room': Appstate.currentChatroom.id, 'user': Appstate.currentUser.id});
     // channel = IOWebSocketChannel.connect(Uri.parse(websocketURL));
     // channel.stream.listen((message) {
     //   if (message != 'connected') {
