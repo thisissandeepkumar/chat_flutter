@@ -1,6 +1,7 @@
 import 'package:chat_flutter/models/appstate.dart';
 import 'package:chat_flutter/models/message.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 // ignore: must_be_immutable
 class MessageTile extends StatefulWidget {
@@ -44,12 +45,48 @@ class MessageTileState extends State<MessageTile> {
                   topRight: Radius.circular(10.0),
                   bottomRight: Radius.circular(10.0)),
         ),
-        child: Text(
-          message.content,
-          textAlign: TextAlign.justify,
-          style: TextStyle(
-            color: isSender ? CupertinoColors.black : CupertinoColors.white,
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              child: Text(
+                message.content,
+                textAlign: TextAlign.justify,
+                style: TextStyle(
+                  color:
+                      isSender ? CupertinoColors.black : CupertinoColors.white,
+                ),
+              ),
+            ),
+            Container(
+              margin: EdgeInsets.only(
+                top: 4.0,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    DateFormat("dd MMM hh:mm a").format(message.sent.toLocal()),
+                    style: TextStyle(
+                      color: isSender
+                          ? CupertinoColors.inactiveGray
+                          : CupertinoColors.extraLightBackgroundGray,
+                      fontSize: 10,
+                    ),
+                  ),
+                  Text(
+                    (isSender ? (' ' + (message.isread ? 'Read' : '')) : ''),
+                    style: TextStyle(
+                      color: isSender
+                          ? CupertinoColors.inactiveGray
+                          : CupertinoColors.extraLightBackgroundGray,
+                      fontSize: 10,
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
         ),
       ),
     );

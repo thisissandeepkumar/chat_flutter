@@ -4,12 +4,8 @@ import 'package:chat_flutter/models/message.dart';
 import 'package:chat_flutter/pages/chatpage/tiles.dart';
 import 'package:chat_flutter/services/message_service.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
-
 import '../../constants.dart';
-import '../../models/appstate.dart';
-import '../../models/appstate.dart';
 import '../../models/appstate.dart';
 import '../../models/message.dart';
 import '../../services/message_service.dart';
@@ -29,7 +25,6 @@ class _ChatPageState extends State<ChatPage> {
 
   void connectToServer() {
     try {
-      print('Trying to connect!');
       socket = IO.io(websocketURL, <String, dynamic>{
         'transports': ['websocket'],
         'auth': {
@@ -43,16 +38,18 @@ class _ChatPageState extends State<ChatPage> {
         print('Connected!');
       });
       socket.on('new', (data) {
-        print(data);
-        messagesList.add(Message(
-            id: data['id'],
-            chatroom_id: Appstate.currentChatroom.id,
-            sender_id: data['sender_id'],
-            content: data['content'],
-            delivered: false,
-            isread: false,
-            sent: DateTime.now()));
-        setState(() {});
+        setState(() {
+          messagesList.add(Message(
+              id: data['id'],
+              chatroom_id: Appstate.currentChatroom.id,
+              sender_id: data['sender_id'],
+              content: data['content'],
+              delivered: false,
+              isread: false,
+              sent: DateTime.now()));
+          scrollController.animateTo(scrollController.position.minScrollExtent,
+              duration: Duration(milliseconds: 300), curve: Curves.easeOut);
+        });
       });
     } catch (e) {
       print(e.toString());
@@ -125,6 +122,9 @@ class _ChatPageState extends State<ChatPage> {
                         } else {
                           messagesList = snapshot.data;
                           return ListView.builder(
+                              padding: EdgeInsets.only(top: 10.0, bottom: 10.0),
+                              key: new UniqueKey(),
+                              reverse: true,
                               controller: scrollController,
                               itemCount: messagesList.length,
                               itemBuilder: (BuildContext context, index) {
@@ -132,7 +132,8 @@ class _ChatPageState extends State<ChatPage> {
                                   width:
                                       MediaQuery.of(context).size.width * 0.4,
                                   child: MessageTile(
-                                    message: messagesList[index],
+                                    message: messagesList[
+                                        (messagesList.length - 1) - index],
                                     mainPageContext: context,
                                   ),
                                 );
@@ -160,6 +161,10 @@ class _ChatPageState extends State<ChatPage> {
                           ),
                           child: Center(
                             child: CupertinoTextField(
+                              onEditingComplete: () {},
+                              onChanged: (String newVal) {},
+                              maxLines: 3,
+                              textAlign: TextAlign.justify,
                               textCapitalization: TextCapitalization.sentences,
                               keyboardType: TextInputType.multiline,
                               controller: messageController,
